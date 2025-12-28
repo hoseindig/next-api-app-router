@@ -24,3 +24,9 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+.nav-list > li > a:hover {
+  /* با استفاده از @apply، کلاس Tailwind را به استایل سفارشی تبدیل می‌کنیم */
+  @apply text-blue-700;
+}
