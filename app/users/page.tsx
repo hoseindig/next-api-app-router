@@ -79,11 +79,16 @@ const UsersPage = () => {
               <td>{user._id}</td>
               <td>{user.name}</td>
               <td>{user.email}</td>
-              <td
-                className=" hover:cursor-pointer hover:text-red-800"
-                onClick={() => deleteUser(user._id)}
-              >
-                Delete
+              <td>
+                <span
+                  className=" hover:cursor-pointer hover:text-red-800"
+                  onClick={() => deleteUser(user._id)}
+                >
+                  Delete
+                </span>
+                <span className=" hover:cursor-pointer hover:text-blue-800 mx-4">
+                  <Link href={`/users/${user._id}`}>View</Link>
+                </span>
               </td>
             </tr>
           ))}

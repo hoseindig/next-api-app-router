@@ -82,32 +82,3 @@ export async function PUT(request) {
     });
   }
 }
-
-// ---------------------------
-// 🗑️ DELETE (Delete): /api/users
-// ---------------------------
-export async function DELETE(request) {
-  try {
-    const { db } = await connectToDatabase();
-    const collection = db.collection("users");
-    console.log("DELETE request received");
-
-    const { _id } = await request.json(); // فرض می‌کنیم _id در Body ارسال شده است
-    console.log("DELETE request received", _id);
-
-    const result = await collection.deleteOne({ _id: new ObjectId(_id) });
-
-    if (result.deletedCount === 0) {
-      return new Response(JSON.stringify({ error: "User not found" }), {
-        status: 404,
-      });
-    }
-
-    return new Response(null, { status: 204 }); // 204 No Content
-  } catch (error) {
-    console.error("DELETE Error:", error);
-    return new Response(JSON.stringify({ error: "Failed to delete user" }), {
-      status: 500,
-    });
-  }
-}
