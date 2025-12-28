@@ -59,7 +59,7 @@ const UsersPage = () => {
 
   return (
     <>
-      <h1>Users</h1>
+      <h1 className="text-center text-3xl">Users</h1>
       <Link href="/users/new" passHref>
         new user
       </Link>
