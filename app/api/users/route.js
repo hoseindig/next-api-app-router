@@ -1,76 +1,111 @@
 // app/api/users/route.js
 // URL Endpoint: /api/users
-
-let mockUsers = [
-  { id: 1, name: "علی احمدی", email: "ali@example.com" },
-  { id: 2, name: "سارا حسینی", email: "sara@example.com" },
-  { id: 3, name: "رضا محمدی", email: "reza@example.com" },
-];
-let nextId = 4; // برای تخصیص IDهای جدید
+import { connectToDatabase } from "@/lib/mongodb"; // فرض می‌کنیم از @/lib/mongodb استفاده می‌کنید
+import { ObjectId } from "mongodb"; // برای کار با IDهای MongoDB
 
 // ---------------------------
 // 📚 GET (Read All): /api/users
 // ---------------------------
 export async function GET() {
-  console.log("درخواست GET: بازگرداندن همه کاربران");
+  try {
+    const { db } = await connectToDatabase();
+    const collection = db.collection("users"); // نام کالکشن
 
-  // شبیه‌سازی تأخیر دیتابیس
-  // await new Promise(resolve => setTimeout(resolve, 500));
+    // واکشی تمام کاربران
+    const users = await collection.find({}).toArray();
 
-  return Response.json(mockUsers);
+    return Response.json(users);
+  } catch (error) {
+    console.error("GET Error:", error);
+    return new Response(JSON.stringify({ error: "Failed to fetch users" }), {
+      status: 500,
+    });
+  }
 }
 
 // ---------------------------
 // ➕ POST (Create): /api/users
 // ---------------------------
 export async function POST(request) {
-  const newUser = await request.json();
+  try {
+    const { db } = await connectToDatabase();
+    const collection = db.collection("users");
 
-  // تخصیص ID و اضافه کردن به لیست
-  newUser.id = nextId++;
-  mockUsers.push(newUser);
+    const userData = await request.json();
 
-  console.log("درخواست POST: کاربر جدید ایجاد شد:", newUser);
+    // افزودن تاریخ ایجاد و ID توسط MongoDB
+    const result = await collection.insertOne(userData);
 
-  return Response.json(newUser, { status: 201 }); // 201 Created
+    // بازگرداندن شیء ایجاد شده
+    const newUser = await collection.findOne({ _id: result.insertedId });
+
+    return Response.json(newUser, { status: 201 }); // 201 Created
+  } catch (error) {
+    console.error("POST Error:", error);
+    return new Response(JSON.stringify({ error: "Failed to create user" }), {
+      status: 500,
+    });
+  }
 }
 
 // ---------------------------
 // 🔄 PUT (Update): /api/users
-// *توجه: در Next.js برای سادگی، PUT روی همان endpoint اصلی پیاده می‌شود.
-// در پروژه‌های واقعی، بهتر است از route داینامیک استفاده شود (مثلاً /api/users/[id]).
 // ---------------------------
 export async function PUT(request) {
-  const updatedUser = await request.json();
-  const index = mockUsers.findIndex((u) => u.id === updatedUser.id);
+  try {
+    const { db } = await connectToDatabase();
+    const collection = db.collection("users");
 
-  if (index !== -1) {
-    mockUsers[index] = { ...mockUsers[index], ...updatedUser };
-    console.log("درخواست PUT: کاربر به‌روزرسانی شد:", mockUsers[index]);
-    return Response.json(mockUsers[index]);
-  } else {
-    return new Response(JSON.stringify({ error: "کاربر پیدا نشد." }), {
-      status: 404,
+    const updatedUserData = await request.json();
+    const { _id, ...updateFields } = updatedUserData; // فرض می‌کنیم _id در Body ارسال شده است
+
+    // به‌روزرسانی بر اساس _id
+    const result = await collection.updateOne(
+      { _id: new ObjectId(_id) },
+      { $set: updateFields }
+    );
+
+    if (result.matchedCount === 0) {
+      return new Response(JSON.stringify({ error: "User not found" }), {
+        status: 404,
+      });
+    }
+
+    // واکشی کاربر به‌روزرسانی شده
+    const updatedUser = await collection.findOne({ _id: new ObjectId(_id) });
+
+    return Response.json(updatedUser);
+  } catch (error) {
+    console.error("PUT Error:", error);
+    return new Response(JSON.stringify({ error: "Failed to update user" }), {
+      status: 500,
     });
   }
 }
 
 // ---------------------------
 // 🗑️ DELETE (Delete): /api/users
-// *توجه: ID کاربری که قرار است حذف شود باید در بدنه درخواست (body) ارسال شود.
 // ---------------------------
 export async function DELETE(request) {
-  const { id } = await request.json();
-  const initialLength = mockUsers.length;
+  try {
+    const { db } = await connectToDatabase();
+    const collection = db.collection("users");
 
-  mockUsers = mockUsers.filter((u) => u.id !== id);
+    const { _id } = await request.json(); // فرض می‌کنیم _id در Body ارسال شده است
 
-  if (mockUsers.length < initialLength) {
-    console.log(`درخواست DELETE: کاربر با ID ${id} حذف شد.`);
+    const result = await collection.deleteOne({ _id: new ObjectId(_id) });
+
+    if (result.deletedCount === 0) {
+      return new Response(JSON.stringify({ error: "User not found" }), {
+        status: 404,
+      });
+    }
+
     return new Response(null, { status: 204 }); // 204 No Content
-  } else {
-    return new Response(JSON.stringify({ error: "کاربر پیدا نشد." }), {
-      status: 404,
+  } catch (error) {
+    console.error("DELETE Error:", error);
+    return new Response(JSON.stringify({ error: "Failed to delete user" }), {
+      status: 500,
     });
   }
 }
