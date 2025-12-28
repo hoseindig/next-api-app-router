@@ -90,8 +90,10 @@ export async function DELETE(request) {
   try {
     const { db } = await connectToDatabase();
     const collection = db.collection("users");
+    console.log("DELETE request received");
 
     const { _id } = await request.json(); // فرض می‌کنیم _id در Body ارسال شده است
+    console.log("DELETE request received", _id);
 
     const result = await collection.deleteOne({ _id: new ObjectId(_id) });
 

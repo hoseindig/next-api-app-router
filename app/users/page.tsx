@@ -22,6 +22,41 @@ const UsersPage = () => {
 
     fetchData();
   }, []);
+
+  const deleteUser = async (id: string) => {
+    setLoading(true);
+
+    // 1. ارسال درخواست DELETE به Route Handler داینامیک
+    const res = await fetch(`/api/users/${id}`, {
+      method: "DELETE",
+    });
+
+    if (res.status === 204) {
+      // 2. موفقیت (204 No Content): حذف از لیست بدون نیاز به خواندن Body
+      setUsers(users.filter((user) => user._id !== id));
+      console.log(`کاربر با ID: ${id} با موفقیت حذف شد.`);
+    } else if (res.ok) {
+      // 3. اگر کد وضعیت موفقیت آمیز دیگری (مثل 200 OK) برگشته باشد
+      // (اگر Route Handler شما 204 برنگردانده بود):
+      const data = await res.json();
+      console.log("پاسخ حذف:", data);
+      setUsers(users.filter((user) => user._id !== id)); // یا بر اساس نیاز
+    } else {
+      // 4. شکست (مثلاً 404 Not Found یا 500 Internal Server Error)
+      let errorMsg = "خطای ناشناخته در حذف";
+      try {
+        const errorData = await res.json();
+        errorMsg = errorData.error || errorMsg;
+      } catch (e) {
+        // اگر سرور هیچ JSONی هم برنگرداند، خطای پیش فرض را نشان بده
+      }
+      console.error(`خطا در حذف کاربر: ${res.status}`, errorMsg);
+      alert(`حذف شکست خورد: ${errorMsg}`);
+    }
+
+    setLoading(false);
+  };
+
   return (
     <>
       <h1>Users</h1>
@@ -35,6 +70,7 @@ const UsersPage = () => {
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -43,6 +79,12 @@ const UsersPage = () => {
               <td>{user._id}</td>
               <td>{user.name}</td>
               <td>{user.email}</td>
+              <td
+                className=" hover:cursor-pointer hover:text-red-800"
+                onClick={() => deleteUser(user._id)}
+              >
+                Delete
+              </td>
             </tr>
           ))}
         </tbody>
