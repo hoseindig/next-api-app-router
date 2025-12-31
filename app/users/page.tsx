@@ -1,28 +1,28 @@
 "use client";
 
 import Loading from "@/components/Loading";
-import { userType } from "@/types/user";
+import { fetchData } from "@/lib/fetchData";
+import { UserType } from "@/types/user";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const UsersPage = () => {
-  const [users, setUsers] = useState<userType[]>([]);
+  const [users, setUsers] = useState<UserType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchDataFn() {
       setLoading(true);
-      const res = await fetch("/api/users");
-      const data = await res.json();
+      const res = await fetchData<UserType[]>("/api/users"); //await fetch("/api/users");
       setLoading(false);
 
-      console.log(data);
-      setUsers(data);
+      console.log(res);
+      setUsers(res);
     }
 
-    fetchData();
+    fetchDataFn();
   }, []);
 
   const deleteUser = async (id: string) => {
