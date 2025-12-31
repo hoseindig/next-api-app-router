@@ -27,12 +27,13 @@ const ProductsPage = () => {
       <GenericTable
         items={products}
         getKey={(item) => item._id}
+        headers={["Id", "Name", "Price", "Description"]}
         renderRow={(item) => (
           <>
-            <td>{item._id}</td>
-            <td>{item.name}</td>
-            <td>{item.price}</td>
-            <td>{item.description}</td>
+            <th>{item._id}</th>
+            <th>{item.name}</th>
+            <th>{item.price}</th>
+            <th>{item.description}</th>
           </>
         )}
       />

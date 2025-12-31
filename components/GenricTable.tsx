@@ -2,17 +2,22 @@ interface GenericTableProps<T> {
   items: T[];
   getKey: (item: T) => React.Key;
   renderRow: (item: T) => React.ReactNode;
+  headers: string[];
 }
 
-function GenericTable<T>({ items, renderRow, getKey }: GenericTableProps<T>) {
+function GenericTable<T>({
+  items,
+  renderRow,
+  getKey,
+  headers,
+}: GenericTableProps<T>) {
   return (
     <table className="w-full border border-gray-300 mt-4">
       <thead>
         <tr className="bg-gray-950 text-white">
-          <th>Id</th>
-          <th>Name</th>
-          <th>Price</th>
-          <th>Description</th>
+          {headers.map((h) => (
+            <th key={h}>{h}</th>
+          ))}
         </tr>
       </thead>
 
