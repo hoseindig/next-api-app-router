@@ -9,6 +9,8 @@ const UsersPage = () => {
   const [users, setUsers] = useState<userType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
@@ -57,12 +59,30 @@ const UsersPage = () => {
     setLoading(false);
   };
 
+  useEffect(() => {
+    // const debouncedValue = useDebounce(searchTerm, 500);
+    const handler = setTimeout(() => {
+      console.log("Searching for:", searchTerm);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
+
   return (
     <>
       <h1 className="text-center text-3xl">Users</h1>
       <Link href="/users/new" passHref>
         new user
       </Link>
+
+      <input
+        placeholder="Search"
+        type="text"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
       {loading ? <Loading /> : null}
       <table className="w-full text-center border border-gray-300  ">
         <thead className="bg-gray-950 text-white">
