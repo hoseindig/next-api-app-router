@@ -33,6 +33,7 @@ export default function RootLayout({
           <NavItem href={"/"}>Home</NavItem>
           <NavItem href={"/dashboard"}>Dashboard</NavItem>
           <NavItem href={"/users"}>Users</NavItem>
+          <NavItem href={"/products"}>Products</NavItem>
         </ul>
         {children}
       </body>
