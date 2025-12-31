@@ -1,5 +1,6 @@
 "use client";
 
+import GenericTable from "@/components/GenricTable";
 import Loading from "@/components/Loading";
 import { fetchData } from "@/lib/fetchData";
 import { UserType } from "@/types/user";
@@ -84,36 +85,19 @@ const UsersPage = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
       {loading ? <Loading /> : null}
-      <table className="w-full text-center border border-gray-300  ">
-        <thead className="bg-gray-950 text-white">
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {users?.map((user) => (
-            <tr key={user._id} className=" odd:bg-gray-100 even:bg-white ">
-              <td>{user._id}</td>
-              <td>{user.name}</td>
-              <td>{user.email}</td>
-              <td>
-                <span
-                  className=" hover:cursor-pointer hover:text-red-800"
-                  onClick={() => deleteUser(user._id)}
-                >
-                  Delete
-                </span>
-                <span className=" hover:cursor-pointer hover:text-blue-800 mx-4">
-                  <Link href={`/users/${user._id}`}>View</Link>
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+
+      <GenericTable<UserType>
+        items={users}
+        getKey={(item) => item._id}
+        headers={["Id", "Name", "Email"]}
+        renderRow={(item) => (
+          <>
+            <th>{item._id}</th>
+            <th>{item.name}</th>
+            <th>{item.email}</th>
+          </>
+        )}
+      />
     </>
   );
 };

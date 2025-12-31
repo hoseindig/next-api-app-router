@@ -3,15 +3,15 @@
 import { fetchData } from "@/lib/fetchData";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { product } from "@/types";
+import { Product } from "@/types";
 import GenericTable from "@/components/GenricTable";
 
 const ProductsPage = () => {
-  const [products, setProducts] = useState<product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     async function getProducts() {
-      const res = await fetchData<product[]>("/api/products");
+      const res = await fetchData<Product[]>("/api/products");
       setProducts(res);
       console.log(res);
     }
@@ -24,7 +24,7 @@ const ProductsPage = () => {
       <Link href="/products/new">Add New Product</Link>
 
       <hr />
-      <GenericTable
+      <GenericTable<Product>
         items={products}
         getKey={(item) => item._id}
         headers={["Id", "Name", "Price", "Description"]}
